@@ -10,37 +10,42 @@
   ([player-strategy house-strategy]
      (test-strategy player-strategy house-strategy 100))
   ([player-strategy house-strategy n]
-     "plays n games and returns how many times the player won"
-     ;; COMPLETE
+     "plays n games and returns how many times the player won as a percentage of n"
+     (float (/ (total (repeatedly n #(play-game player-strategy house-strategy))) n))
      ))
+     
 
 (defn stop-at-17 [hand opponent-up-card]
-  ;; COMPLETE
+   (if (< (total hand) 17) true false) 
   )
 
 (defn stop-at [n]
-  "Returns a strategy that twists until the total is n"
-  ;; COMPLETE
+  "Returns a strategy that hits until the total is n"
+ (fn [hand opponent-up-card] (if (< (total hand) n) true false))
   )
 
 (defn watched [strategy]
-  ;; COMPLETE
-  )
+    (fn [hand opponent-up-card] (let [hit-or-not (strategy hand opponent-up-card)] 
+      (println [hand, opponent-up-card, hit-or-not])
+    hit-or-not
+    ))
+    )
 
 (defn smart-strategy [hand opponent-up-card]
-  ;; COMPLETE
-  )
+  (if (< opponent-up-card 7) ((stop-at 13) hand opponent-up-card)
+    ((stop-at 17) hand opponent-up-card)
+  ))
 
 (defn play-hand [strategy hand opponent-up-card]
   (cond (> (total hand) 21)
         hand
 
-        (strategy hand opponent-up-card) ; Asks 'should I hit?'
+        (strategy hand opponent-up-card) ; Asks 'should I hit?', returns true/false
         (recur strategy
                (add-card hand (deal)) ; Recurs, adding a card
                opponent-up-card)
 
-        :else
+        :else ;the strategy said not to hit, return the hand as is
         hand))
 
 (defn play-game [player-strategy house-strategy]
